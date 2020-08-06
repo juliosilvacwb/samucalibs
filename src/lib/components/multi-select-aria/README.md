@@ -1,4 +1,4 @@
-### Props
+## Props
 
 Field | Type | Required | Default | Description
 isLoadingText | string | no | It's Loading | Text displayed when options is loading.

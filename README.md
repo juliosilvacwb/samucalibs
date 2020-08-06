@@ -1,3 +1,5 @@
-# Multi Select Aria
+# Samuca Lib's
 
-### A component of multi selection with accessibility
+### Custom React Components
+
+The first component is MultiSelectAria, which allows you to select multiple options from a list with accessibility.
