@@ -1,0 +1,107 @@
+.msa-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.msa-main {
+    width: 100%;
+    min-height: 36px;
+    color: #b3b3b3;
+    border: 1px solid #b3b3b3; 
+    border-radius: 30px;
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 30px;
+    display: flex;
+    align-items: center;
+    flex-flow: row wrap;
+    cursor: text;
+}
+
+.msa-input {
+    border: none;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+.msa-input-multi {
+  min-width: 100px;
+  flex-grow: 1;
+  margin-right: 5px;
+}
+
+.msa-input:focus {
+    outline: none;
+}
+
+.chip {
+    background-color: rgba(0, 126, 255, 0.08);
+    color: #2c2c2c;
+    border-radius: 30px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 3px;
+    flex-grow: 0;
+}
+
+.chip-single {
+    background-color: #FFF;
+    color: #2c2c2c;
+    padding-right: 15px;
+    margin: 3px;
+    flex-grow: 1;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  border: none !important;
+  z-index: 2;
+  background-color: #FFF;
+  border-radius: 3px;
+  box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.15);
+}
+
+.select-options {
+  position: absolute;
+  width: 100%;
+  border: 1px solid #d9d9d9;
+}
+
+li {
+  list-style-type: none;
+  padding: 8px 20px;
+  background: #FFF;
+  cursor: pointer;
+  text-align: left;
+  color: #2c2c2c;
+}
+
+.selected {
+  background-color: rgba(0, 126, 255, 0.08);
+  color: #2c2c2c;
+}
+
+.clear {
+  background: none;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  z-index: 1;
+}
+
+.clear:focus, .clear:hover {
+  outline: none;
+  box-shadow: 0 0 0.2rem darkgray;
+}

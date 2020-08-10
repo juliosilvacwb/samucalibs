@@ -1,14 +1,4 @@
-# Samuca Lib's
-
-### Custom React Components
-
-React library with frontend development support components.
-
-## MultiSelectAria
-
-The Select control for React.
-
-### Props
+## Props
 
 Field | Type | Required | Default | Description
 options | array | yes | | List of options, should contains objects with label and value fields.
