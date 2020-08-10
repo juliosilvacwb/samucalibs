@@ -142,7 +142,9 @@ class MultiSelectAria extends React.Component {
       }
 
       if (e.key === 'Enter') {
-        this.handleOptionSelected(this.state.optionSelected);
+        if (this.state.options.length > 0) {
+          this.handleOptionSelected(this.state.optionSelected);
+        }
       }
       
       if (e.key === 'Tab') {
@@ -150,11 +152,13 @@ class MultiSelectAria extends React.Component {
       }
       
       if (e.key === 'Backspace') {
+        if (this.state.filter.length === 0) {
           let selecteds = this.state.selecteds.slice(0, this.state.selecteds.length-1);
           if (selecteds.length === 0 && this.props.initialValue) {
             selecteds = [this.props.initialValue];
           }
           this.setState({...this.state, selecteds})
+        }
       }
       
     }
