@@ -102,7 +102,9 @@ var MultiSelectAria = function (_React$Component) {
       }
 
       if (e.key === 'Enter') {
-        _this.handleOptionSelected(_this.state.optionSelected);
+        if (_this.state.options.length > 0) {
+          _this.handleOptionSelected(_this.state.optionSelected);
+        }
       }
 
       if (e.key === 'Tab') {
@@ -110,11 +112,13 @@ var MultiSelectAria = function (_React$Component) {
       }
 
       if (e.key === 'Backspace') {
-        var selecteds = _this.state.selecteds.slice(0, _this.state.selecteds.length - 1);
-        if (selecteds.length === 0 && _this.props.initialValue) {
-          selecteds = [_this.props.initialValue];
+        if (_this.state.filter.length === 0) {
+          var selecteds = _this.state.selecteds.slice(0, _this.state.selecteds.length - 1);
+          if (selecteds.length === 0 && _this.props.initialValue) {
+            selecteds = [_this.props.initialValue];
+          }
+          _this.setState(Object.assign({}, _this.state, { selecteds: selecteds }));
         }
-        _this.setState(Object.assign({}, _this.state, { selecteds: selecteds }));
       }
     };
 

@@ -11,9 +11,9 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "react": "16.3.2",
-    "react-dom": "16.3.2",
-    "react-scripts": "1.0.17"
+    "react": "^16.3.2",
+    "react-dom": "^16.3.2",
+    "react-scripts": "^1.0.17"
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -26,7 +26,10 @@
     "url": "https://github.com/juliosilvacwb/multi-select-aria.git"
   },
   "keywords": [
-    "Select", "Combobox", "listbox", "aria-selected"
+    "Select",
+    "Combobox",
+    "listbox",
+    "aria-selected"
   ],
   "browserslist": {
     "production": [
