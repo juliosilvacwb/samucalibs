@@ -168,4 +168,4 @@ export default App;
 
 ```
 
-![Example](/example.png)
+![Example](./public/example.png)
