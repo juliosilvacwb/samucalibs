@@ -167,3 +167,5 @@ class App extends React.Component {
 export default App;
 
 ```
+
+![Example](/example.png)
