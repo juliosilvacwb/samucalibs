@@ -25,3 +25,5 @@
 |initialValue | object | no | | A initial value selected.|
 |static | bool | no | false | If true don't reload options.|
 |showOptionSelected | bool | no | false | Show the items selecteds in list options.|
+
+![Example](/example.png)
