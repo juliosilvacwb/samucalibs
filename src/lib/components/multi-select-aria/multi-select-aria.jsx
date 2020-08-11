@@ -36,12 +36,12 @@ class MultiSelectAria extends React.Component {
         if (!this.props.showOptionSelected) {
           const options = newProps.options.filter(item => 
             this.state.selecteds.filter((selected) => item[this.labelKey] === selected[this.labelKey]).length === 0);
-          this.setState({...this.state, options, optionSelected: 0, ariaActivedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
+          this.setState({...this.state, options, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
         } else {
-          this.setState({...this.state, options: newProps.options, optionSelected: 0, ariaActivedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
+          this.setState({...this.state, options: newProps.options, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
         }
       } else if(newProps.isLoading !== this.state.isLoading) {
-        this.setState({...this.state, isLoading: newProps.isLoading, optionSelected: 0, ariaActivedescendant: `${this.hashId}-item-${0}`})
+        this.setState({...this.state, isLoading: newProps.isLoading, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`})
       }
     }
 
@@ -72,7 +72,7 @@ class MultiSelectAria extends React.Component {
   
     handleListDisplay = () => {
       let width = document.getElementById(this.hashId).offsetWidth;
-      this.setState({ ...this.state, showOptionList: true, width });
+      this.setState({ ...this.state, showOptionList: true, width, activedescendant: `${this.hashId}-item-${0}` });
     };
   
     handleOptionSelected = (index) => {
@@ -218,7 +218,10 @@ class MultiSelectAria extends React.Component {
                               aria-multiselectable={true}
                               aria-haspopup={'listbox'}
                               aria-expanded={this.state.showOptionList}
+                              aria-controls={this.props.listName ? this.props.listName : `options-${this.hashId}`}
                               aria-owns={this.props.listName ? this.props.listName : `options-${this.hashId}`}
+                              aria-activedescendant={this.state.activedescendant}
+                              aria-autocomplete="list"
                             />
                             {
                               (!this.multi && this.state.selecteds.length > 0) &&
@@ -228,7 +231,6 @@ class MultiSelectAria extends React.Component {
                         {this.state.showOptionList && (
                             <ul 
                               role={'listbox'}
-                              aria-activedescendant={this.state.activedescendant}
                               className={`select-options ${this.props.classOptions? this.props.classOptions : ''}`} 
                               style={{maxWidth: this.state.width, minWidth:  this.state.width }} 
                               id={this.props.listName ? this.props.listName : `options-${this.hashId}`}
