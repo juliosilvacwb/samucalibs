@@ -1,6 +1,6 @@
 {
   "name": "samuca-libs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {},
   "scripts": {
     "start": "react-scripts start",

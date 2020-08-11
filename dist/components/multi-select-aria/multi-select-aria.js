@@ -33,7 +33,7 @@ var MultiSelectAria = function (_React$Component) {
 
     _this.handleListDisplay = function () {
       var width = document.getElementById(_this.hashId).offsetWidth;
-      _this.setState(Object.assign({}, _this.state, { showOptionList: true, width: width }));
+      _this.setState(Object.assign({}, _this.state, { showOptionList: true, width: width, activedescendant: _this.hashId + '-item-' + 0 }));
     };
 
     _this.handleOptionSelected = function (index) {
@@ -192,12 +192,12 @@ var MultiSelectAria = function (_React$Component) {
               return item[_this2.labelKey] === selected[_this2.labelKey];
             }).length === 0;
           });
-          this.setState(Object.assign({}, this.state, { options: options, optionSelected: 0, ariaActivedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+          this.setState(Object.assign({}, this.state, { options: options, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
         } else {
-          this.setState(Object.assign({}, this.state, { options: newProps.options, optionSelected: 0, ariaActivedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+          this.setState(Object.assign({}, this.state, { options: newProps.options, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
         }
       } else if (newProps.isLoading !== this.state.isLoading) {
-        this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, optionSelected: 0, ariaActivedescendant: this.hashId + '-item-' + 0 }));
+        this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0 }));
       }
     }
   }, {
@@ -264,7 +264,10 @@ var MultiSelectAria = function (_React$Component) {
               'aria-multiselectable': true,
               'aria-haspopup': 'listbox',
               'aria-expanded': this.state.showOptionList,
-              'aria-owns': this.props.listName ? this.props.listName : 'options-' + this.hashId
+              'aria-controls': this.props.listName ? this.props.listName : 'options-' + this.hashId,
+              'aria-owns': this.props.listName ? this.props.listName : 'options-' + this.hashId,
+              'aria-activedescendant': this.state.activedescendant,
+              'aria-autocomplete': 'list'
             }),
             !this.multi && this.state.selecteds.length > 0 && React.createElement(
               'span',
@@ -276,7 +279,6 @@ var MultiSelectAria = function (_React$Component) {
             'ul',
             {
               role: 'listbox',
-              'aria-activedescendant': this.state.activedescendant,
               className: 'select-options ' + (this.props.classOptions ? this.props.classOptions : ''),
               style: { maxWidth: this.state.width, minWidth: this.state.width },
               id: this.props.listName ? this.props.listName : 'options-' + this.hashId
