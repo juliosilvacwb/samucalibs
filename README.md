@@ -8,39 +8,40 @@ React library with frontend development support components.
 
 The Select control for React.
 
-### Props
+## Props
 
-|Field | Type | Required | Default | Description|
-|---|---|---|---|---|
-|options | array | yes | | List of options, should contains objects with label and value fields.|
-|onSelect | func | yes | | Fuction to change list of selecteds.|
-|onInputChange | func | false | | Return the string typed.|
-|labelKey | string | no | label | Field name for the label.|
-|valueKey | string | no | value | Field name for the value.|
-|isLoadingText | string | no | It's Loading | Text displayed when options is loading.|
-|noResultsText | string | no | It's empty | Text displayed when there are no options.|
-|searchPromptText | string | no | Type to search | Text for guidance.|
-|placeholder | string | no | | Placeholder for input.|
-|isLoading | bool | no | false | Indcate if options are loading.|
-|classBox | string | no | | Class for overwrite design.|
-|classChip | string | no | | Class for overwrite design.|
-|classInput | string | no | | Class for overwrite design.|
-|cassClearButton | string | no | | Class for overwrite design.|
-|classOptions | string | no | | Class for overwrite design.|
-|classOptionsItem | string | no | | Class for overwrite design.|
-|listName | string | no | list | ID for list of options.|
-|id | string | no | undefined | ID for component|
-|minimumInput | number | no | 3 | Minimum characters to search start.|
-|multi | bool | no | false | Allows multiple choices.|
-|initialValue | object | no | | A initial value selected.|
-|static | bool | no | false | If true don't reload options.|
-|showOptionSelected | bool | no | false | Show the items selecteds in list options.|
+| Field              | Type         | Required | Default        | Description                                                                          |
+| ------------------ | ------------ | -------- | -------------- | ------------------------------------------------------------------------------------ |
+| labelKey           | string       | no       | label          | Field name for the label.                                                            |
+| valueKey           | string       | no       | value          | Field name for the value.                                                            |
+| options            | array        | yes      |                | Array of options, should contains objects with labelKey and valueKey fields.         |
+| selected           | object/array | yes      |                | Array or Object selected, should contains objects with labelKey and valueKey fields. |
+| onSelect           | func         | yes      |                | Fuction to change list of selecteds.                                                 |
+| onInputChange      | func         | false    |                | Return the string typed.                                                             |
+| isLoadingText      | string       | no       | It's Loading   | Text displayed when options is loading.                                              |
+| noResultsText      | string       | no       | It's empty     | Text displayed when there are no options.                                            |
+| searchPromptText   | string       | no       | Type to search | Text for guidance.                                                                   |
+| placeholder        | string       | no       |                | Placeholder for input.                                                               |
+| isLoading          | bool         | no       | false          | Indcate if options are loading.                                                      |
+| classBox           | string       | no       |                | Class for overwrite design.                                                          |
+| classChip          | string       | no       |                | Class for overwrite design.                                                          |
+| classInput         | string       | no       |                | Class for overwrite design.                                                          |
+| cassClearButton    | string       | no       |                | Class for overwrite design.                                                          |
+| classOptions       | string       | no       |                | Class for overwrite design.                                                          |
+| classOptionsItem   | string       | no       |                | Class for overwrite design.                                                          |
+| listName           | string       | no       | list           | ID for list of options.                                                              |
+| id                 | string       | no       | undefined      | ID for component                                                                     |
+| minimumInput       | number       | no       | 3              | Minimum characters to search start.                                                  |
+| multi              | bool         | no       | false          | Allows multiple choices.                                                             |
+| static             | bool         | no       | false          | If true don't reload options.                                                        |
+| showOptionSelected | bool         | no       | false          | Show the items selecteds in list options.                                            |
+
 
 ### Example
 
 ```
 import React from 'react';
-import {MultiSelectAria} from 'samuca-libs'
+import MultiSelectAria from './lib/components/multi-select-aria/multi-select-aria';
 
 class App extends React.Component {
 
@@ -48,7 +49,7 @@ class App extends React.Component {
     super(props);
     this.state= {
       options: [],
-      selecteds: [],
+      selecteds: [{label: 'item c', value: 'item 2'}],
       initialValue: {label: 'Initial 1', value: 1},
       selectedsForInitialValueExample: [],
       selected: null,
@@ -101,6 +102,7 @@ class App extends React.Component {
                 labelKey={'label'}
                 valueKey={'value'}
                 multi={false}
+                selecteds={this.state.selecteds}
               />
               {
                 this.state.selected && 
@@ -120,6 +122,7 @@ class App extends React.Component {
                 labelKey={'label'}
                 valueKey={'value'}
                 multi={true}
+                selecteds={this.state.selecteds}
               />
               <div style={{marginTop: '2rem'}}>
               {
@@ -141,12 +144,14 @@ class App extends React.Component {
                   {label: 'Initial 2', value: 2},
                   {label: 'Initial 3', value: 3}
                 ]}
-                onSelect={(selectedsForInitialValueExample) => this.setState({...this.state, selectedsForInitialValueExample})}
+                onSelect={(selectedsForInitialValueExample) => 
+                  this.setState({...this.state, selectedsForInitialValueExample})}
                 labelKey={'label'}
                 valueKey={'value'}
                 initialValue={this.state.initialValue}
                 static={true}
                 multi={false}
+                selecteds={this.state.selecteds}
               />
               <div style={{marginTop: '2rem'}}>
               {
@@ -165,7 +170,6 @@ class App extends React.Component {
 }
 
 export default App;
-
 ```
 
 ![Example](./public/example.png)

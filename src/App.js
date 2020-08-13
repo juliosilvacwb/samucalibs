@@ -7,10 +7,9 @@ class App extends React.Component {
     super(props);
     this.state= {
       options: [],
-      selecteds: [],
-      initialValue: {label: 'Initial 1', value: 1},
-      selectedsForInitialValueExample: [],
-      selected: null,
+      selecteds: [{label: 'item c', value: 'item 2'}],
+      selected: undefined,
+      selectedsForInitialValueExample: {label: 'Initial 1', value: 1},
       isLoading: false
     }
   }
@@ -59,7 +58,9 @@ class App extends React.Component {
                 onSelect={(item) => this.onSingleSelect(item)}
                 labelKey={'label'}
                 valueKey={'value'}
+                initialValue={{label: 'item a', value: 'item 1'}}
                 multi={false}
+                selected={this.state.selected}
               />
               {
                 this.state.selected && 
@@ -79,6 +80,7 @@ class App extends React.Component {
                 labelKey={'label'}
                 valueKey={'value'}
                 multi={true}
+                selected={this.state.selecteds}
               />
               <div style={{marginTop: '2rem'}}>
               {
@@ -100,12 +102,13 @@ class App extends React.Component {
                   {label: 'Initial 2', value: 2},
                   {label: 'Initial 3', value: 3}
                 ]}
-                onSelect={(selectedsForInitialValueExample) => this.setState({...this.state, selectedsForInitialValueExample})}
+                onSelect={(selectedsForInitialValueExample) => 
+                  this.setState({...this.state, selectedsForInitialValueExample})}
                 labelKey={'label'}
                 valueKey={'value'}
-                initialValue={this.state.initialValue}
                 static={true}
                 multi={false}
+                selected={this.state.selectedsForInitialValueExample}
               />
               <div style={{marginTop: '2rem'}}>
               {

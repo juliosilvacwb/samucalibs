@@ -22,138 +22,7 @@ var MultiSelectAria = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (MultiSelectAria.__proto__ || Object.getPrototypeOf(MultiSelectAria)).call(this, props));
 
-    _this.handleClickOutside = function (e) {
-      if (!e.target.classList.contains(_this.hashId)) {
-        _this.setState(Object.assign({}, _this.state, {
-          showOptionList: false,
-          optionSelected: 0
-        }));
-      }
-    };
-
-    _this.handleListDisplay = function () {
-      var width = document.getElementById(_this.hashId).offsetWidth;
-      _this.setState(Object.assign({}, _this.state, { showOptionList: true, width: width, activedescendant: _this.hashId + '-item-' + 0 }));
-    };
-
-    _this.handleOptionSelected = function (index) {
-      var showOptionList = false;
-      if (_this.multi) {
-        _this.refInputEl.current.focus();
-        showOptionList = true;
-      }
-
-      var selecteds = _this.multi ? [].concat(_toConsumableArray(_this.state.selecteds), [_this.state.options[index]]) : [_this.state.options[index]];
-
-      if (_this.props.static) {
-        _this.setState(Object.assign({}, _this.state, { selecteds: selecteds, filter: '', showOptionList: showOptionList }));
-      } else {
-        _this.setState(Object.assign({}, _this.state, { selecteds: selecteds, options: [], filter: '', showOptionList: showOptionList }));
-      }
-
-      setTimeout(function () {
-        if (_this.props.onSelect) {
-          if (_this.multi) {
-            _this.props.onSelect(selecteds);
-          } else {
-            _this.props.onSelect(selecteds[0]);
-          }
-          if (_this.props.onInputChange) {
-            _this.props.onInputChange('');
-          }
-        }
-      }, 500);
-    };
-
-    _this.clearListOfSelecteds = function () {
-      var selecteds = _this.props.initialValue ? [_this.props.initialValue] : [];
-      _this.setState(Object.assign({}, _this.state, { selecteds: selecteds, filter: '' }));
-
-      if (_this.props.onSelect) {
-        if (_this.multi && !_this.props.static) {
-          _this.props.onSelect([]);
-        } else if (_this.multi && _this.props.static) {
-          _this.props.onSelect(selecteds);
-        } else if (!_this.multi && _this.props.static) {
-          _this.props.onSelect(_this.props.initialValue);
-        } else {
-          _this.props.onSelect(undefined);
-        }
-      }
-
-      setTimeout(function () {
-        _this.refInputEl.current.focus();
-      }, 300);
-    };
-
-    _this.onKeyControl = function (e) {
-      if (e.key === 'ArrowDown') {
-        if (_this.state.optionSelected < _this.state.options.length - 1) {
-          _this.onOptionOver(_this.state.optionSelected + 1);
-        } else {
-          _this.onOptionOver(Object.assign({}, _this.state, { optionSelected: 0 }));
-        }
-      } else if (e.key === 'ArrowUp') {
-        if (_this.state.optionSelected > 0) {
-          _this.onOptionOver(_this.state.optionSelected - 1);
-        } else {
-          _this.onOptionOver(_this.state.options.length - 1);
-        }
-      }
-
-      if (e.key === 'Enter') {
-        if (_this.state.options.length > 0) {
-          _this.handleOptionSelected(_this.state.optionSelected);
-        }
-      }
-
-      if (e.key === 'Tab') {
-        _this.setState(Object.assign({}, _this.state, { showOptionList: false }));
-      }
-
-      if (e.key === 'Backspace') {
-        if (_this.state.filter.length === 0) {
-          var selecteds = _this.state.selecteds.slice(0, _this.state.selecteds.length - 1);
-          if (selecteds.length === 0 && _this.props.initialValue) {
-            selecteds = [_this.props.initialValue];
-          }
-          _this.setState(Object.assign({}, _this.state, { selecteds: selecteds }));
-        }
-      }
-    };
-
-    _this.onChange = function (value) {
-      var options = _this.props.static ? _this.state.options.filter(function (item) {
-        return item[_this.labelKey].toLowerCase().includes(value.toLowerCase());
-      }) : _this.state.options;
-      if (_this.multi) {
-        _this.setState(Object.assign({}, _this.state, { options: options, filter: value }));
-      } else {
-        _this.setState(Object.assign({}, _this.state, { options: options, filter: value, selecteds: [] }));
-      }
-
-      if (!_this.props.static) {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(function () {
-          if (_this.props.onInputChange && value.length >= _this.minimumInput) {
-            _this.props.onInputChange(value);
-          }
-        }, 500);
-      }
-    };
-
-    _this.onOptionOver = function (index) {
-      var activedescendant = _this.hashId + '-item-' + index;
-      _this.setState(Object.assign({}, _this.state, { optionSelected: index, activedescendant: activedescendant }));
-    };
-
-    _this.optionsWithoutSelecteds = function () {
-      return _this.state.options.filter(function (item) {
-        return _this.state.selecteds.filter(function (selected) {
-          return item[_this.labelKey] === selected[_this.labelKey];
-        }).length === 0;
-      });
-    };
+    _initialiseProps.call(_this);
 
     _this.isLoadingText = props.isLoadingText ? props.isLoadingText : 'It\'s Loading';
     _this.noResultsText = props.noResultsText ? props.noResultsText : 'It\'s empty';
@@ -167,10 +36,25 @@ var MultiSelectAria = function (_React$Component) {
 
     _this.hashId = btoa(new Date().getTime()).replace('==', '').toLowerCase().replace(/\d/g, '');
 
+    if (_this.multi && !Array.isArray(props.selected)) {
+      throw Error('selected should be a array for multi selections');
+    }
+
+    var selecteds = [];
+    if (_this.multi && props.initialValue) {
+      selecteds = [].concat(_toConsumableArray(props.selected), [props.initialValue]);
+    } else if (_this.multi && !props.initialValue) {
+      selecteds = [].concat(_toConsumableArray(props.selected));
+    } else if (!_this.multi && !props.selected && props.initialValue) {
+      selecteds = [props.initialValue];
+    } else {
+      selecteds = [props.selected];
+    }
+
     _this.state = {
       width: 100,
       options: props.options,
-      selecteds: props.initialValue ? [props.initialValue] : [],
+      selecteds: selecteds,
       optionSelected: 0,
       showOptionList: false,
       isLoading: false,
@@ -185,19 +69,51 @@ var MultiSelectAria = function (_React$Component) {
     value: function componentWillReceiveProps(newProps) {
       var _this2 = this;
 
-      if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length > this.minimumInput) {
+      var selected = newProps.selected;
+      if (this.multi && !Array.isArray(selected)) {
+        throw Error('selected should be a array for multi selections');
+      } else if (!Array.isArray(selected)) {
+        selected = selected && selected[this.valueKey] ? [selected] : [];
+      }
+
+      if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length >= this.minimumInput) {
         if (!this.props.showOptionSelected) {
           var options = newProps.options.filter(function (item) {
             return _this2.state.selecteds.filter(function (selected) {
               return item[_this2.labelKey] === selected[_this2.labelKey];
             }).length === 0;
           });
-          this.setState(Object.assign({}, this.state, { options: options, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+
+          if (!this.isListEquals(selected, this.state.selecteds)) {
+            this.setState(Object.assign({}, this.state, { options: options, selecteds: selected, optionSelected: 0,
+              activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+          } else {
+            this.setState(Object.assign({}, this.state, { options: options, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+          }
         } else {
-          this.setState(Object.assign({}, this.state, { options: newProps.options, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+
+          if (!this.isListEquals(selected, this.state.selecteds)) {
+            this.setState(Object.assign({}, this.state, { selecteds: selected, options: newProps.options,
+              optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+          } else {
+            this.setState(Object.assign({}, this.state, { options: newProps.options, optionSelected: 0,
+              activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+          }
         }
+      } else if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length < this.minimumInput && newProps.static) {
+        this.setState(Object.assign({}, this.state, {
+          options: newProps.options,
+          isLoading: newProps.isLoading
+        }));
       } else if (newProps.isLoading !== this.state.isLoading) {
-        this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0 }));
+
+        if (!this.isListEquals(selected, this.state.selecteds)) {
+          this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, selecteds: selected, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0 }));
+        } else {
+          this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0 }));
+        }
+      } else if (!this.isListEquals(selected, this.state.selecteds)) {
+        this.setState(Object.assign({}, this.state, { selecteds: selected }));
       }
     }
   }, {
@@ -267,9 +183,10 @@ var MultiSelectAria = function (_React$Component) {
               'aria-controls': this.props.listName ? this.props.listName : 'options-' + this.hashId,
               'aria-owns': this.props.listName ? this.props.listName : 'options-' + this.hashId,
               'aria-activedescendant': this.state.activedescendant,
-              'aria-autocomplete': 'list'
+              'aria-autocomplete': 'list',
+              autocomplete: 'off'
             }),
-            !this.multi && this.state.selecteds.length > 0 && React.createElement(
+            !this.multi && this.state.selecteds.length > 0 && this.state.selecteds[0] && this.state.selecteds[0].hasOwnProperty(this.labelKey) && React.createElement(
               'span',
               { className: 'chip-single' },
               this.state.selecteds[0][this.labelKey]
@@ -343,9 +260,154 @@ var MultiSelectAria = function (_React$Component) {
   return MultiSelectAria;
 }(React.Component);
 
+var _initialiseProps = function _initialiseProps() {
+  var _this5 = this;
+
+  this.handleClickOutside = function (e) {
+    if (!e.target.classList.contains(_this5.hashId)) {
+      _this5.setState(Object.assign({}, _this5.state, {
+        showOptionList: false,
+        optionSelected: 0
+      }));
+    }
+  };
+
+  this.handleListDisplay = function () {
+    var width = document.getElementById(_this5.hashId).offsetWidth;
+    _this5.setState(Object.assign({}, _this5.state, { showOptionList: true, width: width, activedescendant: _this5.hashId + '-item-' + 0 }));
+  };
+
+  this.handleOptionSelected = function (index) {
+    var showOptionList = false;
+    if (_this5.multi) {
+      _this5.refInputEl.current.focus();
+      showOptionList = true;
+    }
+
+    var selecteds = _this5.multi ? [].concat(_toConsumableArray(_this5.state.selecteds), [_this5.state.options[index]]) : [_this5.state.options[index]];
+
+    if (_this5.props.static) {
+      _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, filter: '', showOptionList: showOptionList }));
+    } else {
+      _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, options: [], filter: '', showOptionList: showOptionList }));
+    }
+
+    setTimeout(function () {
+      if (_this5.props.onSelect) {
+        if (_this5.multi) {
+          _this5.props.onSelect(selecteds);
+        } else {
+          _this5.props.onSelect(selecteds[0]);
+        }
+        if (_this5.props.onInputChange) {
+          _this5.props.onInputChange('');
+        }
+      }
+    }, 500);
+  };
+
+  this.clearListOfSelecteds = function () {
+    var selecteds = _this5.props.initialValue ? [_this5.props.initialValue] : [];
+    _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, filter: '' }));
+
+    if (_this5.props.onSelect) {
+      if (_this5.multi && !_this5.props.static) {
+        _this5.props.onSelect([]);
+      } else if (_this5.multi && _this5.props.static) {
+        _this5.props.onSelect(selecteds);
+      } else if (!_this5.multi && _this5.props.static) {
+        _this5.props.onSelect(_this5.props.initialValue);
+      } else {
+        _this5.props.onSelect(undefined);
+      }
+    }
+
+    setTimeout(function () {
+      _this5.refInputEl.current.focus();
+    }, 300);
+  };
+
+  this.onKeyControl = function (e) {
+    if (e.key === 'ArrowDown') {
+      if (_this5.state.optionSelected < _this5.state.options.length - 1) {
+        _this5.onOptionOver(_this5.state.optionSelected + 1);
+      } else {
+        _this5.onOptionOver(Object.assign({}, _this5.state, { optionSelected: 0 }));
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (_this5.state.optionSelected > 0) {
+        _this5.onOptionOver(_this5.state.optionSelected - 1);
+      } else {
+        _this5.onOptionOver(_this5.state.options.length - 1);
+      }
+    }
+
+    if (e.key === 'Enter') {
+      if (_this5.state.options.length > 0) {
+        _this5.handleOptionSelected(_this5.state.optionSelected);
+      }
+    }
+
+    if (e.key === 'Tab') {
+      _this5.setState(Object.assign({}, _this5.state, { showOptionList: false }));
+    }
+
+    if (e.key === 'Backspace') {
+      if (_this5.state.filter.length === 0) {
+        var selecteds = _this5.state.selecteds.slice(0, _this5.state.selecteds.length - 1);
+        if (selecteds.length === 0 && _this5.props.initialValue) {
+          selecteds = [_this5.props.initialValue];
+        }
+        _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds }));
+        setTimeout(function () {
+          return _this5.props.onSelect(selecteds);
+        }, 300);
+      }
+    }
+  };
+
+  this.onChange = function (value) {
+    var options = _this5.props.static ? _this5.state.options.filter(function (item) {
+      return item[_this5.labelKey].toLowerCase().includes(value.toLowerCase());
+    }) : _this5.state.options;
+    if (_this5.multi) {
+      _this5.setState(Object.assign({}, _this5.state, { options: options, filter: value }));
+    } else {
+      _this5.setState(Object.assign({}, _this5.state, { options: options, filter: value, selecteds: [] }));
+    }
+
+    if (!_this5.props.static) {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(function () {
+        if (_this5.props.onInputChange && value.length >= _this5.minimumInput) {
+          _this5.props.onInputChange(value);
+        }
+      }, 500);
+    }
+  };
+
+  this.onOptionOver = function (index) {
+    var activedescendant = _this5.hashId + '-item-' + index;
+    _this5.setState(Object.assign({}, _this5.state, { optionSelected: index, activedescendant: activedescendant }));
+  };
+
+  this.optionsWithoutSelecteds = function () {
+    return _this5.state.options.filter(function (item) {
+      return _this5.state.selecteds.filter(function (selected) {
+        return item[_this5.labelKey] === selected[_this5.labelKey];
+      }).length === 0;
+    });
+  };
+};
+
 MultiSelectAria.propTypes = {
   options: PropTypes.array.isRequired,
-  onSelect: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
+  selected: function selected(props, propName, componentName) {
+    if (!props.hasOwnProperty(propName)) {
+      return new Error('selected is required.');
+    }
+  }
 };
 
 export default MultiSelectAria;
