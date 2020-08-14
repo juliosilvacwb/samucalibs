@@ -24,30 +24,13 @@ var MultiSelectAria = function (_React$Component) {
 
     _initialiseProps.call(_this);
 
-    _this.isLoadingText = props.isLoadingText ? props.isLoadingText : 'It\'s Loading';
-    _this.noResultsText = props.noResultsText ? props.noResultsText : 'It\'s empty';
-    _this.placeholder = props.placeholder ? props.placeholder : '';
-    _this.searchPromptText = props.searchPromptText ? props.searchPromptText : 'Type to search';
-    _this.minimumInput = props.minimumInput ? props.minimumInput : 3;
     _this.refInputEl = React.createRef();
-    _this.multi = !!_this.props.multi;
-    _this.labelKey = props.labelKey ? props.labelKey : 'label';
-    _this.valueKey = props.valueKey ? props.valueKey : 'value';
-
     _this.hashId = btoa(new Date().getTime()).replace('==', '').toLowerCase().replace(/\d/g, '');
 
-    if (_this.multi && !Array.isArray(props.selected)) {
-      throw Error('selected should be a array for multi selections');
-    }
-
     var selecteds = [];
-    if (_this.multi && props.initialValue) {
-      selecteds = [].concat(_toConsumableArray(props.selected), [props.initialValue]);
-    } else if (_this.multi && !props.initialValue) {
+    if (props.multi) {
       selecteds = [].concat(_toConsumableArray(props.selected));
-    } else if (!_this.multi && !props.selected && props.initialValue) {
-      selecteds = [props.initialValue];
-    } else {
+    } else if (!props.multi && props.selected) {
       selecteds = [props.selected];
     }
 
@@ -59,7 +42,7 @@ var MultiSelectAria = function (_React$Component) {
       showOptionList: false,
       isLoading: false,
       filter: '',
-      activedescendant: props.options.length > 0 ? props.options[0][_this.labelKey] : null
+      activedescendant: props.options.length > 0 ? props.options[0][props.labelKey] : null
     };
     return _this;
   }
@@ -70,47 +53,41 @@ var MultiSelectAria = function (_React$Component) {
       var _this2 = this;
 
       var selected = newProps.selected;
-      if (this.multi && !Array.isArray(selected)) {
-        throw Error('selected should be a array for multi selections');
-      } else if (!Array.isArray(selected)) {
-        selected = selected && selected[this.valueKey] ? [selected] : [];
+      if (!Array.isArray(selected)) {
+        selected = selected && selected[this.props.valueKey] ? [selected] : [];
       }
 
-      if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length >= this.minimumInput) {
+      var state = Object.assign({}, this.state, { optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading });
+
+      if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length >= this.props.minimumInput) {
         if (!this.props.showOptionSelected) {
           var options = newProps.options.filter(function (item) {
             return _this2.state.selecteds.filter(function (selected) {
-              return item[_this2.labelKey] === selected[_this2.labelKey];
+              return item[_this2.props.labelKey] === selected[_this2.props.labelKey];
             }).length === 0;
           });
 
           if (!this.isListEquals(selected, this.state.selecteds)) {
-            this.setState(Object.assign({}, this.state, { options: options, selecteds: selected, optionSelected: 0,
-              activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+            this.setState(Object.assign({}, state, { options: options, selecteds: selected }));
           } else {
-            this.setState(Object.assign({}, this.state, { options: options, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+            this.setState(Object.assign({}, state, { options: options }));
           }
         } else {
 
           if (!this.isListEquals(selected, this.state.selecteds)) {
-            this.setState(Object.assign({}, this.state, { selecteds: selected, options: newProps.options,
-              optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+            this.setState(Object.assign({}, state, { selecteds: selected, options: newProps.options }));
           } else {
-            this.setState(Object.assign({}, this.state, { options: newProps.options, optionSelected: 0,
-              activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading }));
+            this.setState(Object.assign({}, state, { options: newProps.options }));
           }
         }
-      } else if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length < this.minimumInput && newProps.static) {
-        this.setState(Object.assign({}, this.state, {
-          options: newProps.options,
-          isLoading: newProps.isLoading
-        }));
+      } else if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length < this.props.minimumInput && newProps.static) {
+        this.setState(Object.assign({}, this.state, { options: newProps.options, isLoading: newProps.isLoading }));
       } else if (newProps.isLoading !== this.state.isLoading) {
 
         if (!this.isListEquals(selected, this.state.selecteds)) {
-          this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, selecteds: selected, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0 }));
+          this.setState(Object.assign({}, state, { selecteds: selected }));
         } else {
-          this.setState(Object.assign({}, this.state, { isLoading: newProps.isLoading, optionSelected: 0, activedescendant: this.hashId + '-item-' + 0 }));
+          this.setState(Object.assign({}, state));
         }
       } else if (!this.isListEquals(selected, this.state.selecteds)) {
         this.setState(Object.assign({}, this.state, { selecteds: selected }));
@@ -119,6 +96,13 @@ var MultiSelectAria = function (_React$Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
+
+      if (this.props.multi && this.props.initialValue) {
+        this.props.onSelect([].concat(_toConsumableArray(this.props.selected), [this.props.initialValue]));
+      } else if (!this.props.multi && !this.props.selected && this.props.initialValue) {
+        this.props.onSelect(this.props.initialValue);
+      }
+
       document.addEventListener("mousedown", this.handleClickOutside);
     }
   }, {
@@ -132,7 +116,7 @@ var MultiSelectAria = function (_React$Component) {
       var _this3 = this;
 
       return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every(function (val, index) {
-        return val[_this3.labelKey] === b[index][_this3.labelKey] && val[_this3.valueKey] === b[index][_this3.valueKey];
+        return val[_this3.props.labelKey] === b[index][_this3.props.labelKey] && val[_this3.props.valueKey] === b[index][_this3.props.valueKey];
       });
     }
   }, {
@@ -155,27 +139,27 @@ var MultiSelectAria = function (_React$Component) {
                 return _this4.refInputEl.current.focus();
               }
             },
-            this.multi && this.state.selecteds.map(function (item, y) {
+            this.props.multi && this.state.selecteds.map(function (item, y) {
               return React.createElement(
                 'span',
                 { key: y, className: 'chip' },
-                item[_this4.labelKey]
+                item[_this4.props.labelKey]
               );
             }),
             React.createElement('input', {
               id: this.props.id ? this.props.id : undefined,
               ref: this.refInputEl,
-              placeholder: this.multi || this.state.selecteds.length === 0 ? this.placeholder : '',
+              placeholder: this.props.multi || this.state.selecteds.length === 0 ? this.props.placeholder : '',
               type: 'text',
               value: this.state.filter,
-              className: this.hashId + ' msa-input ' + (this.props.classInput ? this.props.classInput : '') + ' ' + (this.multi || this.state.selecteds.length === 0 ? 'msa-input-multi' : ''),
+              className: this.hashId + ' msa-input ' + (this.props.classInput ? this.props.classInput : '') + ' ' + (this.props.multi || this.state.selecteds.length === 0 ? 'msa-input-multi' : ''),
               onChange: function onChange(e) {
                 return _this4.onChange(e.target.value);
               },
               onFocus: this.handleListDisplay,
               onKeyDown: this.onKeyControl,
               style: {
-                width: !this.multi && this.state.selecteds.length > 0 ? '2px' : undefined
+                width: !this.props.multi && this.state.selecteds.length > 0 ? '2px' : undefined
               },
               'aria-multiselectable': true,
               'aria-haspopup': 'listbox',
@@ -184,12 +168,12 @@ var MultiSelectAria = function (_React$Component) {
               'aria-owns': this.props.listName ? this.props.listName : 'options-' + this.hashId,
               'aria-activedescendant': this.state.activedescendant,
               'aria-autocomplete': 'list',
-              autocomplete: 'off'
+              autoComplete: 'off'
             }),
-            !this.multi && this.state.selecteds.length > 0 && this.state.selecteds[0] && this.state.selecteds[0].hasOwnProperty(this.labelKey) && React.createElement(
+            !this.props.multi && this.state.selecteds.length > 0 && this.state.selecteds[0] && this.state.selecteds[0].hasOwnProperty(this.props.labelKey) && React.createElement(
               'span',
               { className: 'chip-single' },
-              this.state.selecteds[0][this.labelKey]
+              this.state.selecteds[0][this.props.labelKey]
             )
           ),
           this.state.showOptionList && React.createElement(
@@ -207,7 +191,7 @@ var MultiSelectAria = function (_React$Component) {
                   id: _this4.hashId + '-item-' + i,
                   role: 'option',
                   className: _this4.hashId + ' custom-select-option \n                                              ' + (_this4.props.classOptionsItem ? _this4.props.classOptionsItem : '') + ' \n                                              ' + (_this4.state.optionSelected === i ? ' selected' : '') + '\n                                            ',
-                  'data-name': option[_this4.labelKey],
+                  'data-name': option[_this4.props.labelKey],
                   key: i,
                   onClick: function onClick() {
                     return _this4.handleOptionSelected(i);
@@ -217,7 +201,7 @@ var MultiSelectAria = function (_React$Component) {
                   },
                   'aria-selected': _this4.state.activedescendant === _this4.hashId + '-item-' + i
                 },
-                option[_this4.labelKey]
+                option[_this4.props.labelKey]
               );
             }),
             this.state.options.length === 0 && !this.state.isLoading && !this.props.static && React.createElement(
@@ -228,7 +212,7 @@ var MultiSelectAria = function (_React$Component) {
                 'aria-selected': this.state.options.length === 0 && !this.state.isLoading && !this.props.static,
                 id: this.hashId + '-item-' + 0
               },
-              this.state.filter.length < this.minimumInput ? this.searchPromptText : this.noResultsText
+              this.state.filter.length < this.props.minimumInput ? this.props.searchPromptText : this.props.noResultsText
             ),
             this.state.isLoading && React.createElement(
               'li',
@@ -238,7 +222,7 @@ var MultiSelectAria = function (_React$Component) {
                 'aria-selected': this.state.isLoading,
                 id: this.hashId + '-item-' + 0
               },
-              this.isLoadingText
+              this.props.isLoadingText
             )
           )
         ),
@@ -279,12 +263,12 @@ var _initialiseProps = function _initialiseProps() {
 
   this.handleOptionSelected = function (index) {
     var showOptionList = false;
-    if (_this5.multi) {
+    if (_this5.props.multi) {
       _this5.refInputEl.current.focus();
       showOptionList = true;
     }
 
-    var selecteds = _this5.multi ? [].concat(_toConsumableArray(_this5.state.selecteds), [_this5.state.options[index]]) : [_this5.state.options[index]];
+    var selecteds = _this5.props.multi ? [].concat(_toConsumableArray(_this5.state.selecteds), [_this5.state.options[index]]) : [_this5.state.options[index]];
 
     if (_this5.props.static) {
       _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, filter: '', showOptionList: showOptionList }));
@@ -294,7 +278,7 @@ var _initialiseProps = function _initialiseProps() {
 
     setTimeout(function () {
       if (_this5.props.onSelect) {
-        if (_this5.multi) {
+        if (_this5.props.multi) {
           _this5.props.onSelect(selecteds);
         } else {
           _this5.props.onSelect(selecteds[0]);
@@ -311,11 +295,11 @@ var _initialiseProps = function _initialiseProps() {
     _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, filter: '' }));
 
     if (_this5.props.onSelect) {
-      if (_this5.multi && !_this5.props.static) {
+      if (_this5.props.multi && !_this5.props.static) {
         _this5.props.onSelect([]);
-      } else if (_this5.multi && _this5.props.static) {
+      } else if (_this5.props.multi && _this5.props.static) {
         _this5.props.onSelect(selecteds);
-      } else if (!_this5.multi && _this5.props.static) {
+      } else if (!_this5.props.multi && _this5.props.static) {
         _this5.props.onSelect(_this5.props.initialValue);
       } else {
         _this5.props.onSelect(undefined);
@@ -368,9 +352,9 @@ var _initialiseProps = function _initialiseProps() {
 
   this.onChange = function (value) {
     var options = _this5.props.static ? _this5.state.options.filter(function (item) {
-      return item[_this5.labelKey].toLowerCase().includes(value.toLowerCase());
+      return item[_this5.props.labelKey].toLowerCase().includes(value.toLowerCase());
     }) : _this5.state.options;
-    if (_this5.multi) {
+    if (_this5.props.multi) {
       _this5.setState(Object.assign({}, _this5.state, { options: options, filter: value }));
     } else {
       _this5.setState(Object.assign({}, _this5.state, { options: options, filter: value, selecteds: [] }));
@@ -379,7 +363,7 @@ var _initialiseProps = function _initialiseProps() {
     if (!_this5.props.static) {
       clearTimeout(typingTimer);
       typingTimer = setTimeout(function () {
-        if (_this5.props.onInputChange && value.length >= _this5.minimumInput) {
+        if (_this5.props.onInputChange && value.length >= _this5.props.minimumInput) {
           _this5.props.onInputChange(value);
         }
       }, 500);
@@ -394,7 +378,7 @@ var _initialiseProps = function _initialiseProps() {
   this.optionsWithoutSelecteds = function () {
     return _this5.state.options.filter(function (item) {
       return _this5.state.selecteds.filter(function (selected) {
-        return item[_this5.labelKey] === selected[_this5.labelKey];
+        return item[_this5.props.labelKey] === selected[_this5.props.labelKey];
       }).length === 0;
     });
   };
@@ -407,7 +391,20 @@ MultiSelectAria.propTypes = {
     if (!props.hasOwnProperty(propName)) {
       return new Error('selected is required.');
     }
+    if (props.multi && !Array.isArray(props.selected)) {
+      throw Error('selected should be a array for multi selections');
+    }
   }
+};
+
+MultiSelectAria.defaultProps = {
+  isLoadingText: 'It\'s Loading',
+  noResultsText: 'It\'s empty',
+  placeholder: '',
+  searchPromptText: 'Type to search',
+  minimumInput: 3,
+  labelKey: 'label',
+  valueKey: 'value'
 };
 
 export default MultiSelectAria;

@@ -6,32 +6,14 @@ let typingTimer;
 class MultiSelectAria extends React.Component {
     constructor(props) {
         super(props);
-
-        this.isLoadingText = props.isLoadingText ? props.isLoadingText : 'It\'s Loading';
-        this.noResultsText = props.noResultsText ? props.noResultsText : 'It\'s empty';
-        this.placeholder = props.placeholder ? props.placeholder : '';
-        this.searchPromptText = props.searchPromptText ? props.searchPromptText : 'Type to search';
-        this.minimumInput = props.minimumInput ? props.minimumInput : 3;
         this.refInputEl = React.createRef();
-        this.multi = !!this.props.multi;
-        this.labelKey = props.labelKey ? props.labelKey : 'label';
-        this.valueKey = props.valueKey ? props.valueKey : 'value';
-
         this.hashId = btoa(new Date().getTime()).replace('==', '').toLowerCase().replace(/\d/g, '');
 
-        if (this.multi && !Array.isArray(props.selected)) {
-          throw Error('selected should be a array for multi selections')
-        }
-
         let selecteds = [];
-        if (this.multi && props.initialValue) {
-          selecteds = [...props.selected, props.initialValue]
-        } else if (this.multi && !props.initialValue) {
+        if (props.multi) {
           selecteds = [...props.selected]
-        } else if (!this.multi && !props.selected && props.initialValue) {
-          selecteds = [props.initialValue]
-        } else {
-          selecteds = [props.selected];
+        } else if (!props.multi && props.selected) {
+          selecteds = [props.selected]
         }
 
         this.state = {
@@ -42,55 +24,47 @@ class MultiSelectAria extends React.Component {
             showOptionList: false,
             isLoading: false,
             filter: '',
-            activedescendant: props.options.length > 0 ? props.options[0][this.labelKey]: null,
+            activedescendant: props.options.length > 0 ? props.options[0][props.labelKey]: null,
         };
     }
 
     componentWillReceiveProps(newProps) {
       let selected = newProps.selected;
-      if (this.multi && !Array.isArray(selected)) {
-        throw Error('selected should be a array for multi selections')
-      } else if (!Array.isArray(selected)) {
-        selected = (selected && selected[this.valueKey]) ? [selected] : [];
+      if (!Array.isArray(selected)) {
+        selected = (selected && selected[this.props.valueKey]) ? [selected] : [];
       }
 
-      if(!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length >= this.minimumInput) {
+      let state = {...this.state, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading};
+
+      if(!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length >= this.props.minimumInput) {
         if (!this.props.showOptionSelected) {
           const options = newProps.options.filter(item => 
-            this.state.selecteds.filter((selected) => item[this.labelKey] === selected[this.labelKey]).length === 0);
+            this.state.selecteds.filter((selected) => item[this.props.labelKey] === selected[this.props.labelKey]).length === 0);
 
           if (!this.isListEquals(selected, this.state.selecteds)) {
-            this.setState({...this.state, options, selecteds: selected, optionSelected: 0, 
-              activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
+            this.setState({...state, options, selecteds: selected})
           } else {
-            this.setState({...this.state, options, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
+            this.setState({...state, options})
           }
 
 
         } else {
 
           if (!this.isListEquals(selected, this.state.selecteds)) {
-            this.setState({...this.state, selecteds: selected, options: newProps.options, 
-              optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
+            this.setState({...state, selecteds: selected, options: newProps.options})
           } else {
-            this.setState({...this.state, options: newProps.options, optionSelected: 0, 
-              activedescendant: `${this.hashId}-item-${0}`, isLoading: newProps.isLoading})
+            this.setState({...state, options: newProps.options})
           }
           
         }
-      } else if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length < this.minimumInput && newProps.static) {
-        this.setState({
-          ...this.state,
-          options: newProps.options,
-          isLoading: newProps.isLoading,
-        });
+      } else if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length < this.props.minimumInput && newProps.static) {
+        this.setState({ ...this.state, options: newProps.options, isLoading: newProps.isLoading});
       } else if(newProps.isLoading !== this.state.isLoading) {
-        
 
         if (!this.isListEquals(selected, this.state.selecteds)) {
-          this.setState({...this.state, isLoading: newProps.isLoading, selecteds: selected, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`})
+          this.setState({...state, selecteds: selected})
         } else {
-          this.setState({...this.state, isLoading: newProps.isLoading, optionSelected: 0, activedescendant: `${this.hashId}-item-${0}`})
+          this.setState({...state})
         }
 
       } else if (!this.isListEquals(selected, this.state.selecteds)) {
@@ -99,6 +73,13 @@ class MultiSelectAria extends React.Component {
     }
 
     componentDidMount() {
+
+      if (this.props.multi && this.props.initialValue) {
+        this.props.onSelect([...this.props.selected, this.props.initialValue]);
+      } else if (!this.props.multi && !this.props.selected && this.props.initialValue) {
+        this.props.onSelect(this.props.initialValue);
+      } 
+
       document.addEventListener("mousedown", this.handleClickOutside);
     }
   
@@ -110,7 +91,7 @@ class MultiSelectAria extends React.Component {
       return Array.isArray(a) &&
         Array.isArray(b) &&
         a.length === b.length &&
-        a.every((val, index) => val[this.labelKey] === b[index][this.labelKey] && val[this.valueKey] === b[index][this.valueKey]);
+        a.every((val, index) => val[this.props.labelKey] === b[index][this.props.labelKey] && val[this.props.valueKey] === b[index][this.props.valueKey]);
     }
   
     handleClickOutside = e => {
@@ -130,12 +111,12 @@ class MultiSelectAria extends React.Component {
   
     handleOptionSelected = (index) => {
       let showOptionList = false;
-      if (this.multi) {
+      if (this.props.multi) {
         this.refInputEl.current.focus();
         showOptionList = true;
       } 
       
-      const selecteds = this.multi ? [...this.state.selecteds, this.state.options[index]] : [this.state.options[index]];
+      const selecteds = this.props.multi ? [...this.state.selecteds, this.state.options[index]] : [this.state.options[index]];
 
       if (this.props.static) {
         this.setState({...this.state, selecteds, filter: '', showOptionList});
@@ -145,7 +126,7 @@ class MultiSelectAria extends React.Component {
       
       setTimeout(() => {
         if (this.props.onSelect) {
-          if (this.multi) {
+          if (this.props.multi) {
             this.props.onSelect(selecteds);
           } else {
             this.props.onSelect(selecteds[0]);
@@ -163,11 +144,11 @@ class MultiSelectAria extends React.Component {
       this.setState({...this.state, selecteds, filter: ''})
 
       if (this.props.onSelect) {
-        if (this.multi && !this.props.static ) {
+        if (this.props.multi && !this.props.static ) {
           this.props.onSelect([]);
-        } else if (this.multi && this.props.static) {
+        } else if (this.props.multi && this.props.static) {
           this.props.onSelect(selecteds);
-        } else if (!this.multi && this.props.static) {
+        } else if (!this.props.multi && this.props.static) {
           this.props.onSelect(this.props.initialValue);
         } else {
           this.props.onSelect(undefined);
@@ -218,8 +199,8 @@ class MultiSelectAria extends React.Component {
     }
 
     onChange = (value) => {
-      const options = this.props.static ? this.state.options.filter(item => item[this.labelKey].toLowerCase().includes(value.toLowerCase())) : this.state.options;
-      if (this.multi) {
+      const options = this.props.static ? this.state.options.filter(item => item[this.props.labelKey].toLowerCase().includes(value.toLowerCase())) : this.state.options;
+      if (this.props.multi) {
         this.setState({...this.state, options, filter: value});
       } else {
         this.setState({...this.state, options, filter: value, selecteds: []});
@@ -228,7 +209,7 @@ class MultiSelectAria extends React.Component {
       if (!this.props.static) {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(() => {
-          if (this.props.onInputChange && value.length >= this.minimumInput) {
+          if (this.props.onInputChange && value.length >= this.props.minimumInput) {
             this.props.onInputChange(value);
           }
         }, 500);
@@ -241,7 +222,7 @@ class MultiSelectAria extends React.Component {
     }
 
     optionsWithoutSelecteds = () => {
-      return this.state.options.filter(item => this.state.selecteds.filter((selected) => item[this.labelKey] === selected[this.labelKey]).length === 0);
+      return this.state.options.filter(item => this.state.selecteds.filter((selected) => item[this.props.labelKey] === selected[this.props.labelKey]).length === 0);
     }
 
     render() {
@@ -253,21 +234,21 @@ class MultiSelectAria extends React.Component {
                           onClick={() => this.refInputEl.current.focus()}
                         >
                             {
-                              this.multi && 
-                              this.state.selecteds.map((item, y) => <span key={y} className={'chip'}>{item[this.labelKey]}</span>)
+                              this.props.multi && 
+                              this.state.selecteds.map((item, y) => <span key={y} className={'chip'}>{item[this.props.labelKey]}</span>)
                             }
                             <input 
                               id={this.props.id ? this.props.id : undefined}
                               ref={this.refInputEl}
-                              placeholder={this.multi || this.state.selecteds.length === 0 ? this.placeholder : ''}
+                              placeholder={this.props.multi || this.state.selecteds.length === 0 ? this.props.placeholder : ''}
                               type="text"
                               value={this.state.filter}
-                              className={`${this.hashId} msa-input ${this.props.classInput? this.props.classInput : ''} ${this.multi || this.state.selecteds.length === 0 ? 'msa-input-multi' : ''}`} 
+                              className={`${this.hashId} msa-input ${this.props.classInput? this.props.classInput : ''} ${this.props.multi || this.state.selecteds.length === 0 ? 'msa-input-multi' : ''}`} 
                               onChange={e => this.onChange(e.target.value)}
                               onFocus={this.handleListDisplay} 
                               onKeyDown={this.onKeyControl} 
                               style={{
-                                width: !this.multi && this.state.selecteds.length > 0 ? '2px' : undefined
+                                width: !this.props.multi && this.state.selecteds.length > 0 ? '2px' : undefined
                               }}
                               aria-multiselectable={true}
                               aria-haspopup={'listbox'}
@@ -276,11 +257,11 @@ class MultiSelectAria extends React.Component {
                               aria-owns={this.props.listName ? this.props.listName : `options-${this.hashId}`}
                               aria-activedescendant={this.state.activedescendant}
                               aria-autocomplete="list"
-                              autocomplete="off"
+                              autoComplete="off"
                             />
                             {
-                              (!this.multi && this.state.selecteds.length > 0 && this.state.selecteds[0] && this.state.selecteds[0].hasOwnProperty(this.labelKey))
-                              && (<span className={'chip-single'}>{this.state.selecteds[0][this.labelKey]}</span>)
+                              (!this.props.multi && this.state.selecteds.length > 0 && this.state.selecteds[0] && this.state.selecteds[0].hasOwnProperty(this.props.labelKey))
+                              && (<span className={'chip-single'}>{this.state.selecteds[0][this.props.labelKey]}</span>)
                               }
                         </div>
                         {this.state.showOptionList && (
@@ -301,13 +282,13 @@ class MultiSelectAria extends React.Component {
                                               ${this.props.classOptionsItem? this.props.classOptionsItem : ''} 
                                               ${this.state.optionSelected === i ? ' selected' : ''}
                                             `} 
-                                            data-name={option[this.labelKey]}
+                                            data-name={option[this.props.labelKey]}
                                             key={i}
                                             onClick={() => this.handleOptionSelected(i) }
                                             onMouseOver={() => this.onOptionOver(i)}
                                             aria-selected={this.state.activedescendant === `${this.hashId}-item-${i}`}
                                             >
-                                            {option[this.labelKey]}
+                                            {option[this.props.labelKey]}
                                         </li>
                                     )})
                                 }
@@ -319,7 +300,7 @@ class MultiSelectAria extends React.Component {
                                     aria-selected={this.state.options.length === 0 && !this.state.isLoading && !this.props.static}
                                     id={`${this.hashId}-item-${0}`}
                                   >
-                                    {this.state.filter.length < this.minimumInput ? this.searchPromptText : this.noResultsText}
+                                    {this.state.filter.length < this.props.minimumInput ? this.props.searchPromptText : this.props.noResultsText}
                                   </li>
                                 }
                                 {
@@ -330,7 +311,7 @@ class MultiSelectAria extends React.Component {
                                     aria-selected={this.state.isLoading}
                                     id={`${this.hashId}-item-${0}`}
                                   >
-                                    {this.isLoadingText}
+                                    {this.props.isLoadingText}
                                   </li>
                                 }
                             </ul>
@@ -354,7 +335,20 @@ MultiSelectAria.propTypes = {
     if (!props.hasOwnProperty(propName)) {
       return new Error('selected is required.');
     }
+    if (props.multi && !Array.isArray(props.selected)) {
+      throw Error('selected should be a array for multi selections')
+    }
   },
+};
+
+MultiSelectAria.defaultProps = {
+  isLoadingText : 'It\'s Loading',
+  noResultsText : 'It\'s empty',
+  placeholder : '',
+  searchPromptText : 'Type to search',
+  minimumInput : 3,
+  labelKey : 'label',
+  valueKey : 'value'
 };
 
 export default MultiSelectAria;

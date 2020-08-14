@@ -16,7 +16,8 @@ class App extends React.Component {
 
   onFilter = (value) => {
 
-    const options = [{label: 'item a', value: 'item 1'},
+    const options = [
+      {label: 'item a', value: 'item 1'},
       {label: 'item c', value: 'item 2'},
       {label: 'item d', value: 'item 3'},
       {label: 'item e', value: 'item 4'},
