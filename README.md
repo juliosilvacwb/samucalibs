@@ -33,7 +33,7 @@ The Select control for React.
 | id                 | string       | no       | undefined      | ID for component                                                                     |
 | minimumInput       | number       | no       | 3              | Minimum characters to search start.                                                  |
 | multi              | bool         | no       | false          | Allows multiple choices.                                                             |
-| static             | bool         | no       | false          | If true don't reload options.                                                        |
+| statick            | bool         | no       | false          | If true don't reload options.                                                        |
 | showOptionSelected | bool         | no       | false          | Show the items selecteds in list options.                                            |
 
 

@@ -8,8 +8,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import './multi-select-aria.css';
 
 var typingTimer = void 0;
@@ -50,46 +50,61 @@ var MultiSelectAria = function (_React$Component) {
   _createClass(MultiSelectAria, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(newProps) {
-      var _this2 = this;
+      var selected = newProps.selected,
+          newIsLoading = newProps.isLoading,
+          newOptions = newProps.options,
+          statick = newProps.statick;
+      var _state = this.state,
+          selecteds = _state.selecteds,
+          isLoading = _state.isLoading,
+          options = _state.options,
+          filter = _state.filter;
+      var _props = this.props,
+          minimumInput = _props.minimumInput,
+          labelKey = _props.labelKey,
+          valueKey = _props.valueKey,
+          showOptionSelected = _props.showOptionSelected;
 
-      var selected = newProps.selected;
+
       if (!Array.isArray(selected)) {
-        selected = selected && selected[this.props.valueKey] ? [selected] : [];
+        selected = selected && selected[valueKey] ? [selected] : [];
       }
 
-      var state = Object.assign({}, this.state, { optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newProps.isLoading });
+      var state = Object.assign({}, this.state, { optionSelected: 0, activedescendant: this.hashId + '-item-' + 0, isLoading: newIsLoading });
+      var isOptionsEquals = this.isListEquals(newOptions, options);
+      var isSeletedsEquals = this.isListEquals(selected, selecteds);
+      var isInputMinimum = filter.length >= minimumInput;
+      var isLoadingEquals = newIsLoading !== isLoading;
 
-      if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length >= this.props.minimumInput) {
-        if (!this.props.showOptionSelected) {
-          var options = newProps.options.filter(function (item) {
-            return _this2.state.selecteds.filter(function (selected) {
-              return item[_this2.props.labelKey] === selected[_this2.props.labelKey];
+      if (!isOptionsEquals && isInputMinimum) {
+        if (!showOptionSelected) {
+          var _options = newOptions.filter(function (item) {
+            return selecteds.filter(function (selected) {
+              return item[labelKey] === selected[labelKey];
             }).length === 0;
           });
 
-          if (!this.isListEquals(selected, this.state.selecteds)) {
-            this.setState(Object.assign({}, state, { options: options, selecteds: selected }));
+          if (!isSeletedsEquals) {
+            this.setState(Object.assign({}, state, { options: _options, selecteds: selected }));
           } else {
-            this.setState(Object.assign({}, state, { options: options }));
+            this.setState(Object.assign({}, state, { options: _options }));
           }
         } else {
-
-          if (!this.isListEquals(selected, this.state.selecteds)) {
-            this.setState(Object.assign({}, state, { selecteds: selected, options: newProps.options }));
+          if (!isSeletedsEquals) {
+            this.setState(Object.assign({}, state, { selecteds: selected, options: newOptions }));
           } else {
-            this.setState(Object.assign({}, state, { options: newProps.options }));
+            this.setState(Object.assign({}, state, { options: newOptions }));
           }
         }
-      } else if (!this.isListEquals(newProps.options, this.state.options) && this.state.filter.length < this.props.minimumInput && newProps.static) {
-        this.setState(Object.assign({}, this.state, { options: newProps.options, isLoading: newProps.isLoading }));
-      } else if (newProps.isLoading !== this.state.isLoading) {
-
-        if (!this.isListEquals(selected, this.state.selecteds)) {
+      } else if (!isOptionsEquals && !isInputMinimum && statick) {
+        this.setState(Object.assign({}, this.state, { options: newOptions, isLoading: newIsLoading }));
+      } else if (isLoadingEquals) {
+        if (!isSeletedsEquals) {
           this.setState(Object.assign({}, state, { selecteds: selected }));
         } else {
           this.setState(Object.assign({}, state));
         }
-      } else if (!this.isListEquals(selected, this.state.selecteds)) {
+      } else if (!isSeletedsEquals) {
         this.setState(Object.assign({}, this.state, { selecteds: selected }));
       }
     }
@@ -113,16 +128,16 @@ var MultiSelectAria = function (_React$Component) {
   }, {
     key: 'isListEquals',
     value: function isListEquals(a, b) {
-      var _this3 = this;
+      var _this2 = this;
 
       return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every(function (val, index) {
-        return val[_this3.props.labelKey] === b[index][_this3.props.labelKey] && val[_this3.props.valueKey] === b[index][_this3.props.valueKey];
+        return val[_this2.props.labelKey] === b[index][_this2.props.labelKey] && val[_this2.props.valueKey] === b[index][_this2.props.valueKey];
       });
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this3 = this;
 
       return React.createElement(
         'div',
@@ -136,14 +151,14 @@ var MultiSelectAria = function (_React$Component) {
               id: this.hashId,
               className: 'msa-main ' + (this.props.classBox ? this.props.classBox : ''),
               onClick: function onClick() {
-                return _this4.refInputEl.current.focus();
+                return _this3.refInputEl.current.focus();
               }
             },
             this.props.multi && this.state.selecteds.map(function (item, y) {
               return React.createElement(
                 'span',
                 { key: y, className: 'chip' },
-                item[_this4.props.labelKey]
+                item[_this3.props.labelKey]
               );
             }),
             React.createElement('input', {
@@ -154,7 +169,7 @@ var MultiSelectAria = function (_React$Component) {
               value: this.state.filter,
               className: this.hashId + ' msa-input ' + (this.props.classInput ? this.props.classInput : '') + ' ' + (this.props.multi || this.state.selecteds.length === 0 ? 'msa-input-multi' : ''),
               onChange: function onChange(e) {
-                return _this4.onChange(e.target.value);
+                return _this3.onChange(e.target.value);
               },
               onFocus: this.handleListDisplay,
               onKeyDown: this.onKeyControl,
@@ -188,28 +203,28 @@ var MultiSelectAria = function (_React$Component) {
               return React.createElement(
                 'li',
                 {
-                  id: _this4.hashId + '-item-' + i,
+                  id: _this3.hashId + '-item-' + i,
                   role: 'option',
-                  className: _this4.hashId + ' custom-select-option \n                                              ' + (_this4.props.classOptionsItem ? _this4.props.classOptionsItem : '') + ' \n                                              ' + (_this4.state.optionSelected === i ? ' selected' : '') + '\n                                            ',
-                  'data-name': option[_this4.props.labelKey],
+                  className: _this3.hashId + ' custom-select-option \n                                              ' + (_this3.props.classOptionsItem ? _this3.props.classOptionsItem : '') + ' \n                                              ' + (_this3.state.optionSelected === i ? ' selected' : '') + '\n                                            ',
+                  'data-name': option[_this3.props.labelKey],
                   key: i,
                   onClick: function onClick() {
-                    return _this4.handleOptionSelected(i);
+                    return _this3.handleOptionSelected(i);
                   },
                   onMouseOver: function onMouseOver() {
-                    return _this4.onOptionOver(i);
+                    return _this3.onOptionOver(i);
                   },
-                  'aria-selected': _this4.state.activedescendant === _this4.hashId + '-item-' + i
+                  'aria-selected': _this3.state.activedescendant === _this3.hashId + '-item-' + i
                 },
-                option[_this4.props.labelKey]
+                option[_this3.props.labelKey]
               );
             }),
-            this.state.options.length === 0 && !this.state.isLoading && !this.props.static && React.createElement(
+            this.state.options.length === 0 && !this.state.isLoading && !this.props.statick && React.createElement(
               'li',
               {
                 className: 'custom-select-option',
                 role: 'option',
-                'aria-selected': this.state.options.length === 0 && !this.state.isLoading && !this.props.static,
+                'aria-selected': this.state.options.length === 0 && !this.state.isLoading && !this.props.statick,
                 id: this.hashId + '-item-' + 0
               },
               this.state.filter.length < this.props.minimumInput ? this.props.searchPromptText : this.props.noResultsText
@@ -232,7 +247,7 @@ var MultiSelectAria = function (_React$Component) {
             'aria-label': 'Clear',
             className: 'clear ' + (this.props.cassClearButton ? this.props.cassClearButton : ''),
             onClick: function onClick() {
-              return _this4.clearListOfSelecteds();
+              return _this3.clearListOfSelecteds();
             }
           },
           'x'
@@ -245,11 +260,11 @@ var MultiSelectAria = function (_React$Component) {
 }(React.Component);
 
 var _initialiseProps = function _initialiseProps() {
-  var _this5 = this;
+  var _this4 = this;
 
   this.handleClickOutside = function (e) {
-    if (!e.target.classList.contains(_this5.hashId)) {
-      _this5.setState(Object.assign({}, _this5.state, {
+    if (!e.target.classList.contains(_this4.hashId)) {
+      _this4.setState(Object.assign({}, _this4.state, {
         showOptionList: false,
         optionSelected: 0
       }));
@@ -257,128 +272,131 @@ var _initialiseProps = function _initialiseProps() {
   };
 
   this.handleListDisplay = function () {
-    var width = document.getElementById(_this5.hashId).offsetWidth;
-    _this5.setState(Object.assign({}, _this5.state, { showOptionList: true, width: width, activedescendant: _this5.hashId + '-item-' + 0 }));
+    var width = document.getElementById(_this4.hashId).offsetWidth;
+    _this4.setState(Object.assign({}, _this4.state, { showOptionList: true, width: width, activedescendant: _this4.hashId + '-item-' + 0 }));
   };
 
   this.handleOptionSelected = function (index) {
     var showOptionList = false;
-    if (_this5.props.multi) {
-      _this5.refInputEl.current.focus();
+    if (_this4.props.multi) {
+      _this4.refInputEl.current.focus();
       showOptionList = true;
     }
 
-    var selecteds = _this5.props.multi ? [].concat(_toConsumableArray(_this5.state.selecteds), [_this5.state.options[index]]) : [_this5.state.options[index]];
+    var selecteds = _this4.props.multi ? [].concat(_toConsumableArray(_this4.state.selecteds), [_this4.state.options[index]]) : [_this4.state.options[index]];
 
-    if (_this5.props.static) {
-      _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, filter: '', showOptionList: showOptionList }));
+    if (_this4.props.statick) {
+      _this4.setState(Object.assign({}, _this4.state, { selecteds: selecteds, filter: '', showOptionList: showOptionList }));
     } else {
-      _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, options: [], filter: '', showOptionList: showOptionList }));
+      _this4.setState(Object.assign({}, _this4.state, { selecteds: selecteds, options: [], filter: '', showOptionList: showOptionList }));
     }
 
     setTimeout(function () {
-      if (_this5.props.onSelect) {
-        if (_this5.props.multi) {
-          _this5.props.onSelect(selecteds);
+      if (_this4.props.onSelect) {
+        if (_this4.props.multi) {
+          _this4.props.onSelect(selecteds);
         } else {
-          _this5.props.onSelect(selecteds[0]);
+          _this4.props.onSelect(selecteds[0]);
         }
-        if (_this5.props.onInputChange) {
-          _this5.props.onInputChange('');
+        if (_this4.props.onInputChange) {
+          _this4.props.onInputChange('');
         }
       }
     }, 500);
   };
 
   this.clearListOfSelecteds = function () {
-    var selecteds = _this5.props.initialValue ? [_this5.props.initialValue] : [];
-    _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds, filter: '' }));
+    var selecteds = _this4.props.initialValue ? [_this4.props.initialValue] : [];
+    _this4.setState(Object.assign({}, _this4.state, { selecteds: selecteds, filter: '' }));
 
-    if (_this5.props.onSelect) {
-      if (_this5.props.multi && !_this5.props.static) {
-        _this5.props.onSelect([]);
-      } else if (_this5.props.multi && _this5.props.static) {
-        _this5.props.onSelect(selecteds);
-      } else if (!_this5.props.multi && _this5.props.static) {
-        _this5.props.onSelect(_this5.props.initialValue);
+    if (_this4.props.onSelect) {
+      if (_this4.props.multi && !_this4.props.statick) {
+        _this4.props.onSelect([]);
+      } else if (_this4.props.multi && _this4.props.statick) {
+        _this4.props.onSelect(selecteds);
+      } else if (!_this4.props.multi && _this4.props.statick) {
+        _this4.props.onSelect(_this4.props.initialValue);
       } else {
-        _this5.props.onSelect(undefined);
+        _this4.props.onSelect(undefined);
       }
     }
 
     setTimeout(function () {
-      _this5.refInputEl.current.focus();
+      _this4.refInputEl.current.focus();
     }, 300);
   };
 
   this.onKeyControl = function (e) {
     if (e.key === 'ArrowDown') {
-      if (_this5.state.optionSelected < _this5.state.options.length - 1) {
-        _this5.onOptionOver(_this5.state.optionSelected + 1);
+      if (_this4.state.optionSelected < _this4.state.options.length - 1) {
+        _this4.onOptionOver(_this4.state.optionSelected + 1);
       } else {
-        _this5.onOptionOver(Object.assign({}, _this5.state, { optionSelected: 0 }));
+        _this4.onOptionOver(Object.assign({}, _this4.state, { optionSelected: 0 }));
       }
     } else if (e.key === 'ArrowUp') {
-      if (_this5.state.optionSelected > 0) {
-        _this5.onOptionOver(_this5.state.optionSelected - 1);
+      if (_this4.state.optionSelected > 0) {
+        _this4.onOptionOver(_this4.state.optionSelected - 1);
       } else {
-        _this5.onOptionOver(_this5.state.options.length - 1);
+        _this4.onOptionOver(_this4.state.options.length - 1);
       }
     }
 
     if (e.key === 'Enter') {
-      if (_this5.state.options.length > 0) {
-        _this5.handleOptionSelected(_this5.state.optionSelected);
+      if (_this4.state.options.length > 0) {
+        _this4.handleOptionSelected(_this4.state.optionSelected);
       }
     }
 
     if (e.key === 'Tab') {
-      _this5.setState(Object.assign({}, _this5.state, { showOptionList: false }));
+      _this4.setState(Object.assign({}, _this4.state, { showOptionList: false }));
     }
 
     if (e.key === 'Backspace') {
-      if (_this5.state.filter.length === 0) {
-        var selecteds = _this5.state.selecteds.slice(0, _this5.state.selecteds.length - 1);
-        if (selecteds.length === 0 && _this5.props.initialValue) {
-          selecteds = [_this5.props.initialValue];
+      if (_this4.state.filter.length === 0) {
+        var selecteds = _this4.state.selecteds.slice(0, _this4.state.selecteds.length - 1);
+        if (selecteds.length === 0 && _this4.props.initialValue) {
+          selecteds = [_this4.props.initialValue];
         }
-        _this5.setState(Object.assign({}, _this5.state, { selecteds: selecteds }));
+        _this4.setState(Object.assign({}, _this4.state, { selecteds: selecteds }));
         setTimeout(function () {
-          return _this5.props.onSelect(selecteds);
+          return _this4.props.onSelect(selecteds);
         }, 300);
       }
     }
   };
 
   this.onChange = function (value) {
-    var options = _this5.props.static ? _this5.state.options.filter(function (item) {
-      return item[_this5.props.labelKey].toLowerCase().includes(value.toLowerCase());
-    }) : _this5.state.options;
-    if (_this5.props.multi) {
-      _this5.setState(Object.assign({}, _this5.state, { options: options, filter: value }));
+    var options = _this4.props.statick ? _this4.state.options.filter(function (item) {
+      return item[_this4.props.labelKey].toLowerCase().includes(value.toLowerCase());
+    }) : _this4.state.options;
+    if (_this4.props.multi) {
+      _this4.setState(Object.assign({}, _this4.state, { options: options, filter: value }));
     } else {
-      _this5.setState(Object.assign({}, _this5.state, { options: options, filter: value, selecteds: [] }));
+      _this4.setState(Object.assign({}, _this4.state, { options: options, filter: value, selecteds: [] }));
+      setTimeout(function () {
+        return _this4.props.onSelect(undefined);
+      });
     }
 
-    if (!_this5.props.static) {
+    if (!_this4.props.statick) {
       clearTimeout(typingTimer);
       typingTimer = setTimeout(function () {
-        if (_this5.props.onInputChange && value.length >= _this5.props.minimumInput) {
-          _this5.props.onInputChange(value);
+        if (_this4.props.onInputChange && value.length >= _this4.props.minimumInput) {
+          _this4.props.onInputChange(value);
         }
-      }, 500);
+      });
     }
   };
 
   this.onOptionOver = function (index) {
-    var activedescendant = _this5.hashId + '-item-' + index;
-    _this5.setState(Object.assign({}, _this5.state, { optionSelected: index, activedescendant: activedescendant }));
+    var activedescendant = _this4.hashId + '-item-' + index;
+    _this4.setState(Object.assign({}, _this4.state, { optionSelected: index, activedescendant: activedescendant }));
   };
 
   this.optionsWithoutSelecteds = function () {
-    return _this5.state.options.filter(function (item) {
-      return _this5.state.selecteds.filter(function (selected) {
-        return item[_this5.props.labelKey] === selected[_this5.props.labelKey];
+    return _this4.state.options.filter(function (item) {
+      return _this4.state.selecteds.filter(function (selected) {
+        return item[_this4.props.labelKey] === selected[_this4.props.labelKey];
       }).length === 0;
     });
   };

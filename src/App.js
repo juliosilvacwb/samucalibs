@@ -107,12 +107,13 @@ class App extends React.Component {
                   this.setState({...this.state, selectedsForInitialValueExample})}
                 labelKey={'label'}
                 valueKey={'value'}
-                static={true}
+                statick={true}
                 multi={false}
                 selected={this.state.selectedsForInitialValueExample}
               />
               <div style={{marginTop: '2rem'}}>
               {
+                this.state.selectedsForInitialValueExample &&
                 <div>
                   <strong>Label: </strong>{this.state.selectedsForInitialValueExample.label}
                   <strong style={{marginLeft: '1rem'}}>Value: </strong>{this.state.selectedsForInitialValueExample.value}
