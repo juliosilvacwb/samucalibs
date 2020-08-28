@@ -13,6 +13,7 @@
 | searchPromptText   | string       | no       | Type to search | Text for guidance.                                                                   |
 | placeholder        | string       | no       |                | Placeholder for input.                                                               |
 | isLoading          | bool         | no       | false          | Indcate if options are loading.                                                      |
+| classContainer     | string       | no       |                | Class for overwrite design.                                                          |
 | classBox           | string       | no       |                | Class for overwrite design.                                                          |
 | classChip          | string       | no       |                | Class for overwrite design.                                                          |
 | classInput         | string       | no       |                | Class for overwrite design.                                                          |

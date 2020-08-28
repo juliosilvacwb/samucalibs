@@ -229,7 +229,7 @@ class MultiSelectAria extends React.Component {
 
   render() {
     return <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div className={'msa-container'}>
+      <div className={`msa-container ${this.props.classContainer ? this.props.classContainer : ''}`>
         <div
           id={this.hashId}
           className={`msa-main ${this.props.classBox ? this.props.classBox : ''}`}
