@@ -26,7 +26,7 @@ The Select control for React.
 | classBox           | string       | no       |                | Class for overwrite design.                                                          |
 | classChip          | string       | no       |                | Class for overwrite design.                                                          |
 | classInput         | string       | no       |                | Class for overwrite design.                                                          |
-| cassClearButton    | string       | no       |                | Class for overwrite design.                                                          |
+| classClearButton   | string       | no       |                | Class for overwrite design.                                                          |
 | classOptions       | string       | no       |                | Class for overwrite design.                                                          |
 | classOptionsItem   | string       | no       |                | Class for overwrite design.                                                          |
 | listName           | string       | no       | list           | ID for list of options.                                                              |
