@@ -190,7 +190,7 @@ class MultiSelectAria extends React.Component {
       if (this.state.filter.length === 0) {
         let selecteds = this.state.selecteds.slice(0, this.state.selecteds.length - 1);
         if (selecteds.length === 0 && this.props.initialValue) {
-          selecteds = [this.props.initialValue];
+          selecteds = this.state.multi ? [this.props.initialValue] : this.props.initialValue;
         }
         this.setState({ ...this.state, selecteds })
         setTimeout(() => this.props.onSelect(selecteds), 300);
