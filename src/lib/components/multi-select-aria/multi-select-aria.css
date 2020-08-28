@@ -43,6 +43,7 @@
     padding-right: 15px;
     margin: 3px;
     flex-grow: 0;
+    text-align: left;
 }
 
 .chip-single {
@@ -51,6 +52,7 @@
     padding-right: 15px;
     margin: 3px;
     flex-grow: 1;
+    text-align: left;
 }
 
 ul {
